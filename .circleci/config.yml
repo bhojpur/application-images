@@ -7,55 +7,55 @@ jobs:
       - image: ubuntu:20.10
     steps:
       - checkout
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           name: Run pre-commit checks
           command: |
             apt update && apt install -y shellcheck pre-commit git
             pre-commit run --all-files
-  application-base:
+  platform-base:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
-            ./.circleci/build_image.sh base/Dockerfile bhojpur/application-base
-            docker save bhojpur/application-base -o application-base.tar
+            ./.circleci/build_image.sh base/Dockerfile bhojpur/platform-base
+            docker save bhojpur/platform-base -o platform-base.tar
           no_output_timeout: 20m
-      - persist_to_application:
+      - persist_to_platform:
           root: .
           paths:
-            - application-base.tar
+            - platform-base.tar
 
   platform-full:
     docker:
-      - image: csweichel/dazzle:latest
+      - image: bhojpur/ara:latest
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
-            docker load -i application-base.tar
-            ./.circleci/dazzle_build_image.sh full/Dockerfile bhojpur/platform-full platform-full.tar
+            docker load -i platform-base.tar
+            ./.circleci/ara_build_image.sh full/Dockerfile bhojpur/platform-full platform-full.tar
           no_output_timeout: 30m
       - run:
           name: Save test results
           command: |
-            mkdir -p ~/test-results/dazzle/
-            cp full/*.xml ~/test-results/dazzle
+            mkdir -p ~/test-results/ara/
+            cp full/*.xml ~/test-results/ara
           when: always
       - store_test_results:
           path: ~/test-results
       - store_artifacts:
-          path: ~/test-results/dazzle
-      - persist_to_application:
+          path: ~/test-results/ara
+      - persist_to_platform:
           root: .
           paths:
             - platform-full.tar
@@ -66,14 +66,14 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full.tar
             ./.circleci/build_image.sh full-vnc/Dockerfile bhojpur/platform-full-vnc
             docker save bhojpur/platform-full-vnc -o platform-full-vnc.tar
-      - persist_to_application:
+      - persist_to_platform:
           root: .
           paths:
             - platform-full-vnc.tar
@@ -84,7 +84,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
@@ -92,135 +92,135 @@ jobs:
             ./.circleci/build_image.sh mdbook/Dockerfile bhojpur/mdbook
           no_output_timeout: 30m
 
-  application-dotnet:
+  platform-dotnet:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full.tar
-            ./.circleci/build_image.sh dotnet/Dockerfile bhojpur/application-dotnet
+            ./.circleci/build_image.sh dotnet/Dockerfile bhojpur/platform-dotnet
           no_output_timeout: 60m
 
-  application-dotnet-vnc:
+  platform-dotnet-vnc:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full-vnc.tar
-            ./.circleci/build_image.sh dotnet-vnc/Dockerfile bhojpur/application-dotnet-vnc
+            ./.circleci/build_image.sh dotnet-vnc/Dockerfile bhojpur/platform-dotnet-vnc
           no_output_timeout: 30m
 
-  application-dotnet-lts:
+  platform-dotnet-lts:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full.tar
-            ./.circleci/build_image.sh dotnet-lts/Dockerfile bhojpur/application-dotnet-lts
+            ./.circleci/build_image.sh dotnet-lts/Dockerfile bhojpur/platform-dotnet-lts
           no_output_timeout: 60m
 
-  application-dotnet-lts-vnc:
+  platform-dotnet-lts-vnc:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full-vnc.tar
-            ./.circleci/build_image.sh dotnet-lts-vnc/Dockerfile bhojpur/application-dotnet-lts-vnc
+            ./.circleci/build_image.sh dotnet-lts-vnc/Dockerfile bhojpur/platform-dotnet-lts-vnc
           no_output_timeout: 30m
 
-  application-postgres:
+  platform-postgres:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full.tar
-            ./.circleci/build_image.sh postgres/Dockerfile bhojpur/application-postgres
+            ./.circleci/build_image.sh postgres/Dockerfile bhojpur/platform-postgres
           no_output_timeout: 30m
 
-  application-mysql:
+  platform-mysql:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full.tar
-            ./.circleci/build_image.sh mysql/Dockerfile bhojpur/application-mysql
+            ./.circleci/build_image.sh mysql/Dockerfile bhojpur/platform-mysql
           no_output_timeout: 30m
 
-  application-mongodb:
+  platform-mongodb:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full.tar
-            ./.circleci/build_image.sh mongodb/Dockerfile bhojpur/application-mongodb
-  application-flutter:
+            ./.circleci/build_image.sh mongodb/Dockerfile bhojpur/platform-mongodb
+  platform-flutter:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full.tar
-            ./.circleci/build_image.sh flutter/Dockerfile bhojpur/application-flutter
+            ./.circleci/build_image.sh flutter/Dockerfile bhojpur/platform-flutter
   applicaiton-gecko:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
             docker load -i platform-full-vnc.tar
-            ./.circleci/build_image.sh gecko/Dockerfile bhojpur/application-gecko
+            ./.circleci/build_image.sh gecko/Dockerfile bhojpur/platform-gecko
           no_output_timeout: 60m
 
-  application-wasm:
+  platform-wasm:
     docker:
       - image: docker:stable
     steps:
       - checkout
       - setup_remote_docker
-      - attach_application:
+      - attach_platform:
           at: .
       - run:
           command: |
@@ -233,45 +233,45 @@ workflows:
   build-and-deploy:
     jobs:
       - validate-changes
-      - application-base:
+      - platform-base:
           requires:
             - validate-changes
       - platform-full:
           requires:
-            - application-base
+            - platform-base
       - platform-full-vnc:
           requires:
             - platform-full
       - mdbook:
           requires:
             - platform-full
-      - application-dotnet:
+      - platform-dotnet:
           requires:
             - platform-full
-      - application-dotnet-vnc:
+      - platform-dotnet-vnc:
           requires:
             - platform-full-vnc
-      - application-dotnet-lts:
+      - platform-dotnet-lts:
           requires:
             - platform-full
-      - application-dotnet-lts-vnc:
+      - platform-dotnet-lts-vnc:
           requires:
             - platform-full-vnc
-      - application-postgres:
+      - platform-postgres:
           requires:
             - platform-full
-      - application-mysql:
+      - platform-mysql:
           requires:
             - platform-full
-      - application-mongodb:
+      - platform-mongodb:
           requires:
             - platform-full
-      - application-flutter:
+      - platform-flutter:
           requires:
             - platform-full
-      - application-gecko:
+      - platform-gecko:
           requires:
             - platform-full-vnc
-      - application-wasm:
+      - platform-wasm:
           requires:
             - platform-full
