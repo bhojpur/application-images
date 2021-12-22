@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -o errexit
+
+# Block users from running this unless they're root.
+if [[ $EUID != 0 ]]; then
+  echo >&2 "Run this script again as root to upgrade packages."
+  exit 1
+fi
+
+# Set a runlevel to avoid invoke-rc.d warnings
+# http://manpages.ubuntu.com/manpages/focal/man8/runlevel.8.html#environment
+# shellcheck disable=SC2034
+RUNLEVEL=1
+
+# shellcheck disable=SC2034
+DEBIAN_FRONTEND=noninteractive
+
+ARA_MARKS="/var/lib/apt/ara-marks/"
+TIMESTAMP=$(date +%s)
+
+if [ ! -d "${ARA_MARKS}" ]; then
+  mkdir -p "${ARA_MARKS}"
+fi
+
+apt-get update
+apt-get upgrade -yq --no-install-recommends
+
+cp /var/lib/dpkg/status "${ARA_MARKS}/${TIMESTAMP}.status"
+
+apt-get clean -y
+
+rm -rf \
+   /var/cache/debconf/* \
+   /var/lib/apt/lists/* \
+   /tmp/* \
+   /var/tmp/*
