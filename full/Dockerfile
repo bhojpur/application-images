@@ -1,7 +1,7 @@
-# Ara does not supports ARG TRIGGER_REBUILD=2
+# Bhojpur Ara does not supports ARG TRIGGER_REBUILD=2
 FROM bhojpur/platform-base:latest
 
-RUN echo "ws full starts"
+RUN echo "Bhojpur.NET Platform full starts"
 
 ### Install C/C++ compiler and associated tools ###
 LABEL ara/layer=lang-c
@@ -75,7 +75,7 @@ RUN sudo apt remove -y cmake \
 LABEL ara/layer=lang-go
 LABEL ara/test=tests/lang-go.yaml
 USER bhojpur
-ENV GO_VERSION=1.17.3
+ENV GO_VERSION=1.17.5
 ENV GOPATH=$HOME/go-packages
 ENV GOROOT=$HOME/go
 ENV PATH=$GOROOT/bin:$GOPATH/bin:$PATH
@@ -201,7 +201,7 @@ ENV PATH=$CARGO_HOME/bin:$PATH
 RUN sudo mkdir -p $CARGO_HOME \
     && sudo chown -R bhojpur:bhojpur $CARGO_HOME
 
-RUN bash -lc "cargo install cargo-watch cargo-edit cargo-tree cargo-applications"
+RUN bash -lc "cargo install cargo-watch cargo-edit cargo-tree cargo-workspaces"
 
 ### Clojure ###
 LABEL ara/layer=lang-clojure
@@ -282,7 +282,7 @@ RUN . /home/bhojpur/.nix-profile/etc/profile.d/nix.sh \
 LABEL ara/layer=ara-prologue
 LABEL ara/test=tests/prologue.yaml
 USER root
-RUN curl -o /usr/bin/ara-util -fsSL https://github.com/bhojpur/ara/releases/download/v0.0.3/ara-util_0.0.3_Linux_x86_64 \
+RUN curl -o /usr/bin/ara-util -fsSL https://github.com/bhojpur/ara/releases/download/v0.0.2/ara-util_0.0.2_Linux_x86_64 \
     && chmod +x /usr/bin/ara-util
 # merge dpkg status files
 RUN cp /var/lib/dpkg/status /tmp/dpkg-status \
