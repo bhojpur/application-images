@@ -28,7 +28,7 @@ $DOCKER_PASS
 EOF
 
 cd "$DIR"
-ara build --repository bhojpur/ara-wsfull-build --output-test-xml results.xml -t "$IMAGE_NAME:$BUILD_TAG" -f "$DOCKERFILE" .
+ara build --repository bhojpur/ara-full-build --output-test-xml results.xml -t "$IMAGE_NAME:$BUILD_TAG" -f "$DOCKERFILE" .
 
 if [ "$CIRCLE_BRANCH" != "master" ]; then
   # Work in progress: Tag the image ":branch-X" and push it to Docker Hub.
