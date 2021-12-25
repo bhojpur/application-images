@@ -8,7 +8,7 @@ then
     touch /var/run/mysqld/bhojpur-init.lock
 
     # initialize database structures on disk, if needed
-    [ ! -d /workspace/mysql ] && mysqld --initialize-insecure
+    [ ! -d /application/mysql ] && mysqld --initialize-insecure
 
     # launch database, if not running
     [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize
